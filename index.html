@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-3">
+        <form class="col-md-6">
+        <div class="form-group">
+            <label for="formGroupExampleInput">Province</label>
+            <select class="form-select form-control" name="province" id="province"> 
+                <option value="" selected="selected">Select one</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="formGroupExampleInput2">Districts</label>
+            <select class="form-select form-control" name="districts" id="districts">
+                <option value="">Select one</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="formGroupExampleInput2">Municipalities</label>
+            <select class="form-select form-control" name="municipalities" id="municipalities">
+                <option value="">Select one</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="formGroupExampleInput2">Wards</label>
+            <select class="form-select form-control" name="wards" id="wards">
+                <option value="">Select one</option>
+            </select>
+        </div>
+    </form>
+    </div>
+    <script>
+       fetch('companies.json')
+         .then(response => response.json())
+         .then(jsonData => {
+            function listProvince(){
+                for (index in jsonData){
+                    var option = document.createElement("option");
+                    option.text = jsonData[index].name;
+                    option.value = jsonData[index].id;
+                    document.getElementById("province").appendChild(option);
+                }
+            }
+            function listDistricts(province){
+                var districts = document.getElementById("districts");
+                districts.innerHTML = "";
+                var defaultOption = document.createElement("option");
+                defaultOption.text = "Select one";
+                districts.appendChild(defaultOption);
+                for (index in jsonData){
+                    if (jsonData[index].id == province){
+                        for (dis in jsonData[index].districts){
+                            var option =document.createElement("option");
+                            option.text = jsonData[index].districts[dis].name;
+                            option.value = jsonData[index].districts[dis].id;
+                            document.getElementById("districts").appendChild(option);
+                        }
+                    }
+                }
+            }
+            function listMunicipalities(province, district){
+                var mulicipal = document.getElementById("municipalities");
+                mulicipal.innerHTML = "";
+                var defaultOption = document.createElement("option");
+                defaultOption.text = "Select one";
+                mulicipal.appendChild(defaultOption);
+                for (index in jsonData){
+                    if (jsonData[index].id == province){
+                        for(dis in jsonData[index].districts)
+                            if (jsonData[index].districts[dis].id == district){
+                                for (mul in jsonData[index].districts[dis].municipalities){
+                                    var option = document.createElement("option");
+                                    option.text = jsonData[index].districts[dis].municipalities[mul].name;
+                                    option.value = jsonData[index].districts[dis].municipalities[mul].id;
+                                    document.getElementById("municipalities").appendChild(option);
+                                }
+                                
+                            }
+                    }
+                }
+            }
+            function listWards(province, district, municipality){
+                 var ward = document.getElementById("wards");
+                ward.innerHTML = "";
+                var defaultOption = document.createElement("option");
+                defaultOption.text = "Select one";
+                ward.appendChild(defaultOption);
+                for (index in jsonData){
+                    if (jsonData[index].id == province){
+                        for(dis in jsonData[index].districts)
+                            if (jsonData[index].districts[dis].id == district){
+                                for (mul in jsonData[index].districts[dis].municipalities){
+                                    if (jsonData[index].districts[dis].municipalities[mul].id == municipality){
+                                        for (ward in jsonData[index].districts[dis].municipalities[mul].wards){
+                                            var option = document.createElement("option");
+                                            option.text = jsonData[index].districts[dis].municipalities[mul].wards[ward];
+                                            option.value = jsonData[index].districts[dis].municipalities[mul].wards[ward];
+                                            document.getElementById("wards").appendChild(option);
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+            var selected_province = document.getElementById("province");
+            var selected_districts = document.getElementById("districts");
+            var selected_municipality = document.getElementById("municipalities");
+            var selected_wards = document.getElementById("wards");
+            selected_province.onchange = function(){
+                selected_districts.innerHTML ="";
+                selected_municipality.innerHTML = "";
+                selected_wards.innerHTML = "";
+                var prov = selected_province.options[selected_province.selectedIndex].value;
+                listDistricts(prov);
+            }
+            selected_districts.onchange = function(){
+                var prov = selected_province.options[selected_province.selectedIndex].value;
+                var dis = selected_districts.options[selected_districts.selectedIndex].value;
+                listMunicipalities(prov, dis);
+            }
+            selected_municipality.onchange= function(){
+                var prov = selected_province.options[selected_province.selectedIndex].value;
+                var dis = selected_districts.options[selected_districts.selectedIndex].value;
+                var mul = selected_municipality.options[selected_municipality.selectedIndex].value;
+                listWards(prov, dis, mul)
+            }
+            listProvince();
+         })
+        .catch(err => {
+            console.log(err);
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script> 
+    
+</body>
+</html>
