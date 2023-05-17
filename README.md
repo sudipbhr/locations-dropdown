@@ -20,7 +20,7 @@
 
 ### Technologies Used
     HTML
-    CSS (Bootstrap framework)
+    CSS
     JavaScript
 
 ### Getting Started
